@@ -9,7 +9,7 @@ public class PatrolState : BaseState
     public int WaypointIndex;
     public override void Enter()
     {
-        enemy.Agent.speed = 1;
+        enemy.Agent.destination = enemy.path.waypoints[0].position;
     }
 
     public override void Exit()
@@ -28,7 +28,7 @@ public class PatrolState : BaseState
 
     public void PatrolCycle()
     {
-        if(enemy.Agent.remainingDistance < 0.2f)
+        if(enemy.Agent.reachedDestination)
         {
             waitTimer += Time.deltaTime;
 
@@ -38,20 +38,20 @@ public class PatrolState : BaseState
                     WaypointIndex++;
                 else
                     WaypointIndex = 0;
-                enemy.Agent.SetDestination(enemy.path.waypoints[WaypointIndex].position);
+                enemy.Agent.destination = enemy.path.waypoints[WaypointIndex].position;
                 waitTimer = 0;
             }
         }
-        if (enemy.Agent.velocity != Vector3.zero)
-        {
-            Vector3 moveDirection = new Vector3(enemy.Agent.velocity.x, enemy.Agent.velocity.y, 0f);
-            if (moveDirection != Vector3.zero)
-            {
-                float angel = Mathf.Atan2(moveDirection.x, moveDirection.y) * Mathf.Rad2Deg;
-                Quaternion targetRotation = Quaternion.AngleAxis(angel, Vector3.back);
-                enemy.transform.rotation = Quaternion.RotateTowards(enemy.transform.rotation, targetRotation, 200 * Time.deltaTime);
-            }
-        }
+        //if (enemy.Agent.velocity != Vector3.zero)
+        //{
+        //    Vector3 moveDirection = new Vector3(enemy.Agent.velocity.x, enemy.Agent.velocity.y, 0f);
+        //    if (moveDirection != Vector3.zero)
+        //    {
+        //        float angel = Mathf.Atan2(moveDirection.x, moveDirection.y) * Mathf.Rad2Deg;
+        //        Quaternion targetRotation = Quaternion.AngleAxis(angel, Vector3.back);
+        //        enemy.transform.rotation = Quaternion.RotateTowards(enemy.transform.rotation, targetRotation, 200 * Time.deltaTime);
+        //    }
+        //}
 
     }
 }
