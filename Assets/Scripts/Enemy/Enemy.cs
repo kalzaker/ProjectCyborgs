@@ -37,6 +37,7 @@ public class Enemy : MonoBehaviour
         currentState = stateMachine.activeState.ToString();
         debugPlayerPosPoint.transform.position = lastPlayerKnownPos;
     }
+
     public bool CanSeePlayer()
     {
         if(fow.visibleTargets.Count > 0)
