@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Pathfinding;
 
 public class Enemy : MonoBehaviour
 {
     StateMachine stateMachine;
-    NavMeshAgent agent;
+    IAstarAI agent;
     Vector3 lastPlayerKnownPos;
     [HideInInspector] public FieldOfView fow;
-    public NavMeshAgent Agent { get => agent; }
+    public IAstarAI Agent { get => agent; }
     public Vector3 LastPlayerKnownPos { get => lastPlayerKnownPos; set => lastPlayerKnownPos = value; }
 
     public Path path;
@@ -24,9 +25,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         stateMachine = GetComponent<StateMachine>();
-        agent = GetComponent<NavMeshAgent>();
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
+        agent = GetComponent<IAstarAI>();
         stateMachine.Initialise();
         fow = GetComponent<FieldOfView>();
     }

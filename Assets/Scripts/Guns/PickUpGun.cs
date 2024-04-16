@@ -12,6 +12,12 @@ public class PickUpGun : MonoBehaviour
     [SerializeField] bool isRanged;
 
     GameObject player;
+    SpriteRenderer sr;
+
+    private void Start()
+    {
+        sr = GetComponent<SpriteRenderer>();
+    }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -33,7 +39,7 @@ public class PickUpGun : MonoBehaviour
     {
         if (player != null && Input.GetKey(KeyCode.E))
         {
-            player.GetComponent<Weapon>().GetGun(gunName, isRanged, ammo, fireRate, this.gameObject);
+            
         }
     }
 

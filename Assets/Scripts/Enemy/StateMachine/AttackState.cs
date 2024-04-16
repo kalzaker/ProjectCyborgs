@@ -11,7 +11,7 @@ public class AttackState : BaseState
 
     public override void Enter()
     {
-        enemy.Agent.speed = 2;
+
     }
 
     public override void Exit()
@@ -24,21 +24,12 @@ public class AttackState : BaseState
         if (enemy.CanSeePlayer())
         {
             losePlayerTimer = 0;
-            moveTimer += Time.deltaTime;
             shotTimer += Time.deltaTime;
 
-            Vector2 direction = (enemy.fow.visibleTargets[0].position - enemy.transform.position).normalized;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            enemy.transform.rotation = Quaternion.Euler(Vector3.forward * (angle - 90f));
+            enemy.Agent.destination = enemy.fow.visibleTargets[0].position;
 
             if (shotTimer > enemy.fireRate)
                 Shoot();
-
-            if(moveTimer > Random.Range(3, 7))
-            {
-                enemy.Agent.SetDestination(enemy.transform.position + (Random.insideUnitSphere * 3));
-                moveTimer = 0;
-            }
 
             enemy.LastPlayerKnownPos = enemy.fow.visibleTargets[0].position;
         }
