@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FlyingGun : MonoBehaviour
 {
-    float flyingTime = 2f;
+    float flyingTime = 1f;
     Vector3 direction;
     Rigidbody2D rb;
 
@@ -14,14 +14,12 @@ public class FlyingGun : MonoBehaviour
         direction.x = mousePos.x - transform.position.x;
         direction.y = mousePos.y - transform.position.y;
         direction.z = 0;
+        direction = direction.normalized * 3;
         rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Dynamic;
+        //rb.bodyType = RigidbodyType2D.Dynamic;
         rb.AddForce(direction * 40);
-    }
-
-    public void SetDirection(Vector3 dir)
-    {
-        direction = dir;
+        GetComponent<Weapon>().pickUpAvailable = false;
+        Invoke("SetPickUpAvailableTrue", 0.3f);
     }
 
     private void Update()
@@ -31,22 +29,29 @@ public class FlyingGun : MonoBehaviour
         flyingTime -= Time.deltaTime;
         if(flyingTime <= 0)
         {
-            rb.bodyType = RigidbodyType2D.Static;
-            Destroy(this);
+            //rb.bodyType = RigidbodyType2D.Static;
+            DestroyThisComponent();
+            rb.velocity = new Vector2(0, 0);
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        if (collision.TryGetComponent<IHitable>(out IHitable target))
         {
-            //Hit enemy
+            target.Hit();
         }
-        else if (!collision.CompareTag("Player"))
-        {
-            Debug.Log("че");
-            rb.bodyType = RigidbodyType2D.Static;
-            Destroy(this);
-        }
+        
+    }
+
+    void SetPickAvailableTrue()
+    {
+        GetComponent<Weapon>().pickUpAvailable = true;
+    }
+
+    void DestroyThisComponent()
+    {
+        Destroy(this);
+        SetPickAvailableTrue();
     }
 }

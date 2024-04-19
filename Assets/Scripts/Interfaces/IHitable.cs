@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ThisScriptIsAboutWeaponsButItWillNotBeNamedWeapon : MonoBehaviour
+public interface IHitable
 {
-    
+    public abstract void Hit();
 }
