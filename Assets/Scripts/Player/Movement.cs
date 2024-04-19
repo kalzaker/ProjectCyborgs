@@ -47,6 +47,7 @@ public class Movement : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (!isLocalPlayer) return;
         _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
 
         Vector2 lookDirection = _mousePosition - _rigidbody.position;
