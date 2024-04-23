@@ -1,28 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngineInternal;
 using Mirror;
+using Cinemachine;
 
 public class Movement : NetworkBehaviour
 {
     [SerializeField] float _moveSpeed = 5f;
     [SerializeField] LayerMask gunMask;
 
+    Camera cam;
+
     Rigidbody2D _rigidbody;
-    Camera _camera;
 
     Vector2 _movement;
     Vector2 _mousePosition;
 
     [SerializeField] Weapon gun;
 
-    void Start()
+    public override void OnStartLocalPlayer()
     {
-        if (!isLocalPlayer) return;
-        _rigidbody = GetComponent<Rigidbody2D>();
-        _camera = Camera.main;
+        if (isLocalPlayer)
+        {
+            _rigidbody = GetComponent<Rigidbody2D>();
+            cam = Camera.main;
+        }       
     }
 
     void Update()
@@ -31,7 +33,7 @@ public class Movement : NetworkBehaviour
         _movement.x = Input.GetAxisRaw("Horizontal");
         _movement.y = Input.GetAxisRaw("Vertical");
 
-        _mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+        _mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetButtonDown("Fire2"))
         {
