@@ -53,10 +53,7 @@ public class Movement : NetworkBehaviour
         _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
 
         Vector2 lookDirection = _mousePosition - _rigidbody.position;
-        _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f;
-
-
-        
+        _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f; 
     }
 
     void TryPickUpGun()
