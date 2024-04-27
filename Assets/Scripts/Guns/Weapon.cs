@@ -15,6 +15,7 @@ public abstract class Weapon : NetworkBehaviour
 
     void Update()
     {
+        if (pickUpAvailable) return;
         if (timeBetweenAttacks >= 0)
         {
             timeBetweenAttacks -= Time.deltaTime;
@@ -24,7 +25,7 @@ public abstract class Weapon : NetworkBehaviour
     public void PickUp(Transform attachmentPoint)
     {
         if (!pickUpAvailable) return;
-        this.GetComponent<Rigidbody2D>().transform.SetParent(attachmentPoint);
+        this.transform.SetParent(attachmentPoint);
         this.gameObject.transform.localPosition = Vector2.zero;
     }
 

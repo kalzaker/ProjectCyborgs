@@ -40,6 +40,7 @@ public class FlyingGun : MonoBehaviour
         if (collision.TryGetComponent<IHitable>(out IHitable target))
         {
             target.Hit();
+            DestroyThisComponent();
         }
         
     }

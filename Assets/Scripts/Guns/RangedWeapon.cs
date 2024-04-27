@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public abstract class RangedWeapon : Weapon
+public class RangedWeapon : Weapon
 {
     [SerializeField] protected float ammo, spray, attackCooldown, bulletSpeed, bulletsPerShoot;
 

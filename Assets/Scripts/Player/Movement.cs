@@ -15,6 +15,7 @@ public class Movement : NetworkBehaviour
 
     Vector2 _movement;
     Vector2 _mousePosition;
+    Vector2 lookDirection;
 
     [SerializeField] Weapon gun;
 
@@ -28,18 +29,17 @@ public class Movement : NetworkBehaviour
     void Update()
     {
         if (!isLocalPlayer) return;
-        _movement.x = Input.GetAxisRaw("Horizontal");
-        _movement.y = Input.GetAxisRaw("Vertical");
+        lookDirection = _mousePosition - _rigidbody.position;
 
         _mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetButtonDown("Fire2"))
         {
-            DropGun();
-            TryPickUpGun();
+            CmdDropGun();
+            CmdTryPickUpGun();
         }
 
-        if(Input.GetButton("Fire1") && gun != null)
+        if (Input.GetButton("Fire1") && gun != null)
         {
             gun.CmdAttack(_mousePosition - _rigidbody.position);
         }
@@ -48,28 +48,31 @@ public class Movement : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
-        _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
+        _movement.x = Input.GetAxisRaw("Horizontal");
+        _movement.y = Input.GetAxisRaw("Vertical");
 
-        Vector2 lookDirection = _mousePosition - _rigidbody.position;
+        _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
         _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f;
 
 
-        
+
     }
 
-    void TryPickUpGun()
+    [Command]
+    void CmdTryPickUpGun()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, gunMask);
         if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= .8f)
         {
-            gun = hit.collider.GetComponent<Weapon>();            
+            gun = hit.collider.GetComponent<Weapon>();
             gun.firePoint = transform.GetChild(0);
             gun.PickUp(transform);
         }
     }
 
-    void DropGun()
+    [Command]
+    void CmdDropGun()
     {
         if (gun == null) return;
         gun.Drop();
