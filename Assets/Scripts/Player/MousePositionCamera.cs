@@ -2,17 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using Cinemachine;
 
 public class MousePositionCamera : NetworkBehaviour
 {
     Camera _camera;
+    CinemachineVirtualCamera _virtualCamera;
     [SerializeField] Transform _player;
-    [SerializeField] float _threshold = 0;
+    float _threshold = 0;
 
-    void Start()
+    public override void OnStartLocalPlayer()
     {
         if (!isLocalPlayer) return;
-        _camera = Camera.main;    
+        _camera = Camera.main;
+        _virtualCamera = GameObject.FindObjectOfType<CinemachineVirtualCamera>();
+        _virtualCamera.Follow = this.gameObject.transform;
     }
 
     void Update()

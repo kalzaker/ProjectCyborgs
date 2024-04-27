@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Enemy
   - Walls
+  - VCam
+  - Mouse
   layers:
   - Default
   - TransparentFX

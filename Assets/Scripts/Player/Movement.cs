@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngineInternal;
 using Mirror;
+using Cinemachine;
 
 public class Movement : NetworkBehaviour
 {
     [SerializeField] float _moveSpeed = 5f;
     [SerializeField] LayerMask gunMask;
 
+    Camera cam;
+
     Rigidbody2D _rigidbody;
-    Camera _camera;
 
     Vector2 _movement;
     Vector2 _mousePosition;
@@ -19,19 +19,18 @@ public class Movement : NetworkBehaviour
 
     [SerializeField] Weapon gun;
 
-    void Start()
+    public override void OnStartLocalPlayer()
     {
-        if (!isLocalPlayer) return;
-        _rigidbody = GetComponent<Rigidbody2D>();
-        _camera = Camera.main;
+        if (isLocalPlayer)
+        {
+            _rigidbody = GetComponent<Rigidbody2D>();
+            cam = Camera.main;
+        }       
     }
 
     void Update()
     {
         if (!isLocalPlayer) return;
-        lookDirection = _mousePosition - _rigidbody.position;
-
-        _mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetButtonDown("Fire2"))
         {
@@ -50,12 +49,12 @@ public class Movement : NetworkBehaviour
         if (!isLocalPlayer) return;
         _movement.x = Input.GetAxisRaw("Horizontal");
         _movement.y = Input.GetAxisRaw("Vertical");
+        
+        _mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
+        lookDirection = _mousePosition - _rigidbody.position;
 
         _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
-        _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f;
-
-
-
+        _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f; 
     }
 
     [Command]
