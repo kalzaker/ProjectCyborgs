@@ -16,7 +16,7 @@ public class FlyingGun : MonoBehaviour
         direction.z = 0;
         direction = direction.normalized * 3;
         rb = GetComponent<Rigidbody2D>();
-        //rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.bodyType = RigidbodyType2D.Dynamic;
         rb.AddForce(direction * 40);
         GetComponent<Weapon>().pickUpAvailable = false;
         Invoke("SetPickUpAvailableTrue", 0.3f);
@@ -29,7 +29,7 @@ public class FlyingGun : MonoBehaviour
         flyingTime -= Time.deltaTime;
         if(flyingTime <= 0)
         {
-            //rb.bodyType = RigidbodyType2D.Static;
+            rb.bodyType = RigidbodyType2D.Static;
             DestroyThisComponent();
             rb.velocity = new Vector2(0, 0);
         }
