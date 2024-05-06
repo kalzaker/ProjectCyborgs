@@ -1,33 +1,43 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class FlyingGun : MonoBehaviour
+public class FlyingGun : NetworkBehaviour
 {
     float flyingTime = 1f;
-    Vector3 direction;
+    [SerializeField]Vector3 direction;
     Rigidbody2D rb;
+    [SerializeField] float velocity;
 
     private void Start()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint( Input.mousePosition );
-        direction.x = mousePos.x - transform.position.x;
-        direction.y = mousePos.y - transform.position.y;
-        direction.z = 0;
-        direction = direction.normalized * 3;
-        rb = GetComponent<Rigidbody2D>();
-        //rb.bodyType = RigidbodyType2D.Dynamic;
-        rb.AddForce(direction * 40);
-        GetComponent<Weapon>().pickUpAvailable = false;
-        Invoke("SetPickUpAvailableTrue", 0.3f);
+        RpcFly();
     }
 
     private void Update()
     {
+        RpcRotate();
+    }
 
+    [ClientRpc]
+    void RpcFly()
+    {
+        direction = this.gameObject.GetComponent<Weapon>().lookDirection;
+
+        direction = direction.normalized;
+        rb = GetComponent<Rigidbody2D>();
+        rb.AddForce(direction * 40);
+        GetComponent<Weapon>().pickUpAvailable = false;
+    }
+
+    [ClientRpc]
+    void RpcRotate()
+    {
         transform.Rotate(0f, 0f, Mathf.Lerp(400f, 0f, Time.deltaTime) * Time.deltaTime);
         flyingTime -= Time.deltaTime;
-        if(flyingTime <= 0)
+        velocity = rb.velocity.x;
+        if (flyingTime <= 0)
         {
             //rb.bodyType = RigidbodyType2D.Static;
             DestroyThisComponent();

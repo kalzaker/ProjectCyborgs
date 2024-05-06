@@ -14,9 +14,12 @@ public class Movement : NetworkBehaviour
     Rigidbody2D _rigidbody;
 
     Vector2 _movement;
+
+    [SyncVar]
     Vector2 _mousePosition;
     Vector2 lookDirection;
 
+    [SyncVar]
     [SerializeField] Weapon gun;
 
     public override void OnStartLocalPlayer()
@@ -25,22 +28,29 @@ public class Movement : NetworkBehaviour
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             cam = Camera.main;
-        }       
+        }
     }
 
     void Update()
     {
         if (!isLocalPlayer) return;
+        _mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetButtonDown("Fire2"))
         {
             CmdDropGun();
-            CmdTryPickUpGun();
+            Debug.Log(_mousePosition);
+            CmdTryPickUpGun(_mousePosition);
         }
 
-        if (Input.GetButton("Fire1") && gun != null)
+        if (Input.GetButton("Fire1"))
         {
-            gun.CmdAttack(_mousePosition - _rigidbody.position);
+            if (gun != null) CmdAttack(_mousePosition);
+        }
+
+        if (gun != null)
+        {
+            gun.lookDirection = lookDirection;
         }
     }
 
@@ -49,32 +59,46 @@ public class Movement : NetworkBehaviour
         if (!isLocalPlayer) return;
         _movement.x = Input.GetAxisRaw("Horizontal");
         _movement.y = Input.GetAxisRaw("Vertical");
-        
-        _mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
-        lookDirection = _mousePosition - _rigidbody.position;
 
+        lookDirection = _mousePosition - _rigidbody.position;
         _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
-        _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f; 
+        _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f;
     }
 
-    [Command]
-    void CmdTryPickUpGun()
+    [Command(requiresAuthority = false)]
+    void CmdTryPickUpGun(Vector2 mousePos)
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Debug.Log("CmdTryPickUpGun");
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, gunMask);
         if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= .8f)
         {
+            Debug.Log("Zaszel wpopu");
             gun = hit.collider.GetComponent<Weapon>();
+            if (!gun.pickUpAvailable) return;
             gun.firePoint = transform.GetChild(0);
-            gun.PickUp(transform);
+            gun.CmdPickUp(transform);
+            //CmdPickUpGun(hit);
         }
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     void CmdDropGun()
     {
+        Debug.Log("CmdDropGun");
         if (gun == null) return;
-        gun.Drop();
+        gun.CmdDrop();
         gun = null;
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdAttack(Vector2 mousePos)
+    {
+        if (gun != null)
+        {
+            Debug.Log("attack");
+            //if (gun == null) return;
+            Debug.Log(gun);
+            gun.CmdAttack(mousePos - _rigidbody.position);
+        }
     }
 }

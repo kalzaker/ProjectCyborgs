@@ -149,8 +149,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 0.2
-  m_LinearDrag: 3
-  m_AngularDrag: 1
+  m_LinearDrag: 0.1
+  m_AngularDrag: 0.1
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -265,10 +265,11 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  pickUpAvailable: 0
   ammo: 15
   spray: 0.1
   attackCooldown: 0.3
-  bulletSpeed: 4
+  bulletSpeed: 20
   bulletsPerShoot: 1
   _bullet: {fileID: 1941777009891542158, guid: 1cdee9b175fec0d478d04eb6dc9852b9, type: 3}
 --- !u!1 &6848605553664783855

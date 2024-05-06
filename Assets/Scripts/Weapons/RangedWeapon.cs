@@ -10,8 +10,8 @@ public class RangedWeapon : Weapon
     [SerializeField] protected GameObject _bullet;
 
 
-    [Command]
-    public override void CmdAttack(Vector2 shootDirection)
+    [ClientRpc]
+    protected override void RpcAttack(Vector2 shootDirection)
     {
         if (timeBetweenAttacks <= 0 && ammo > 0)
         {
@@ -21,6 +21,7 @@ public class RangedWeapon : Weapon
             {
                 float shift = Random.Range(-spray, spray);
                 GameObject bullet = Instantiate(_bullet, firePoint.position, Quaternion.LookRotation(Vector3.forward, new Vector2(shootDirection.x + shift, shootDirection.y + shift)));
+                NetworkServer.Spawn(bullet);
                 bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(shootDirection.x + shift, shootDirection.y + shift).normalized * bulletSpeed;
             }
         }
