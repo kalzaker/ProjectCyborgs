@@ -8,10 +8,10 @@ public class MeleeWeapon : Weapon
     [SerializeField] protected float attackRange;
     [SerializeField] protected LayerMask enemyLayer;
 
-    [ClientRpc]
-    protected override void RpcAttack(Vector2 shootDirection)
+    [Command(requiresAuthority = false)]
+    public override void CmdAttack(Vector2 shootDirection)
     {
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(new Vector2(firePoint.position.x, firePoint.position.y), attackRange, enemyLayer);
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(new Vector2(attackPoint.position.x, attackPoint.position.y), attackRange, enemyLayer);
         if (hitColliders.Length == 0) return;
         
         foreach (Collider2D collider in hitColliders)

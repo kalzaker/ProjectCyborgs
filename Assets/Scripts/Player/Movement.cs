@@ -17,10 +17,15 @@ public class Movement : NetworkBehaviour
 
     [SyncVar]
     Vector2 _mousePosition;
+
     Vector2 lookDirection;
 
     [SyncVar]
     [SerializeField] Weapon gun;
+
+    [SerializeField] Transform firePoint;
+
+    Vector2 firePointPosition;
 
     public override void OnStartLocalPlayer()
     {
@@ -38,19 +43,18 @@ public class Movement : NetworkBehaviour
 
         if (Input.GetButtonDown("Fire2"))
         {
-            CmdDropGun();
-            Debug.Log(_mousePosition);
-            CmdTryPickUpGun(_mousePosition);
+            DropGun();
+            TryPickUpGun(_mousePosition);
         }
 
         if (Input.GetButton("Fire1"))
         {
-            if (gun != null) CmdAttack(_mousePosition);
+            Attack(_mousePosition);
         }
 
-        if (gun != null)
+        if(gun != null)
         {
-            gun.lookDirection = lookDirection;
+            gun.CmdSetLookDirection(lookDirection);
         }
     }
 
@@ -65,8 +69,7 @@ public class Movement : NetworkBehaviour
         _rigidbody.rotation = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg - 90f;
     }
 
-    [Command(requiresAuthority = false)]
-    void CmdTryPickUpGun(Vector2 mousePos)
+    void TryPickUpGun(Vector2 mousePos)
     {
         Debug.Log("CmdTryPickUpGun");
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, gunMask);
@@ -75,30 +78,23 @@ public class Movement : NetworkBehaviour
             Debug.Log("Zaszel wpopu");
             gun = hit.collider.GetComponent<Weapon>();
             if (!gun.pickUpAvailable) return;
-            gun.firePoint = transform.GetChild(0);
-            gun.CmdPickUp(transform);
+            firePointPosition = firePoint.localPosition;
+            gun.CmdPickUp(transform, firePointPosition);
             //CmdPickUpGun(hit);
         }
     }
 
-    [Command(requiresAuthority = false)]
-    void CmdDropGun()
+    void DropGun()
     {
         Debug.Log("CmdDropGun");
         if (gun == null) return;
         gun.CmdDrop();
         gun = null;
     }
-
-    [Command(requiresAuthority = false)]
-    void CmdAttack(Vector2 mousePos)
+    
+    void Attack(Vector2 mousePos)
     {
-        if (gun != null)
-        {
-            Debug.Log("attack");
-            //if (gun == null) return;
-            Debug.Log(gun);
-            gun.CmdAttack(mousePos - _rigidbody.position);
-        }
+        if (gun == null) return;
+        gun.CmdAttack(mousePos - _rigidbody.position);
     }
 }

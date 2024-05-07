@@ -11,7 +11,6 @@ public abstract class Weapon : NetworkBehaviour
     [SyncVar]
     float flyingTime;
 
-    [SyncVar]
     protected float timeBetweenAttacks;
 
     [SyncVar]
@@ -21,9 +20,9 @@ public abstract class Weapon : NetworkBehaviour
     bool canAttack;
 
     [SyncVar]
-    public Vector2 lookDirection;
+    [SerializeField] public Vector2 lookDirection;
 
-    public Transform firePoint { get; set; }
+    [SerializeField] protected Transform attackPoint;
 
     void Start()
     {
@@ -46,18 +45,20 @@ public abstract class Weapon : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdPickUp(Transform attachmentPoint)
+    public void CmdPickUp(Transform attachmentPoint, Vector2 attackPointPosition)
     {
-        RpcPickUp(attachmentPoint);
+        RpcPickUp(attachmentPoint, attackPointPosition);
     }
 
     [ClientRpc]
-    void RpcPickUp(Transform attachmentPoint)
+    void RpcPickUp(Transform attachmentPoint, Vector2 attackPointPosition)
     {
         Debug.Log("PickUp");
         if (!pickUpAvailable) return;
         this.transform.SetParent(attachmentPoint);
-        this.gameObject.transform.localPosition = Vector2.zero;
+        this.gameObject.transform.localPosition = attackPointPosition;
+        //attackPoint.localPosition = attackPointPosition;
+        transform.rotation = attachmentPoint.rotation;
         pickUpAvailable = false;
         canAttack = true;
     }
@@ -65,10 +66,7 @@ public abstract class Weapon : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdDrop()
     {
-        Debug.Log("Drop");
-        canAttack = false;
-        this.gameObject.transform.parent = null;
-        flyingTime = 1.2f;
+        RpcDrop();
     }
 
     [ClientRpc]
@@ -80,14 +78,8 @@ public abstract class Weapon : NetworkBehaviour
         flyingTime = 1.2f;
     }
 
-    [Command]
-    public void CmdAttack(Vector2 shootDirection)
-    {
-        RpcAttack(shootDirection);
-    }
-
-    [ClientRpc]
-    protected virtual void RpcAttack(Vector2 shootDirection)
+    [Command(requiresAuthority = false)]
+    public virtual void CmdAttack(Vector2 shootDirection)
     {
         if (!canAttack) return;
     }
@@ -103,7 +95,7 @@ public abstract class Weapon : NetworkBehaviour
         rb.velocity = lookDirection.normalized * 10 * flyingTime * flyingTime;
         pickUpAvailable = false;
 
-        transform.Rotate(0f, 0f, Mathf.Lerp(600f, 0f, Time.deltaTime) * Time.deltaTime);
+        transform.Rotate(0f, 0f, Mathf.Lerp(600f * flyingTime, 0f, Time.deltaTime) * Time.deltaTime);
         flyingTime -= Time.deltaTime;
         if (flyingTime <= 0)
         {
@@ -111,6 +103,18 @@ public abstract class Weapon : NetworkBehaviour
             pickUpAvailable = true;
             return;
         }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdSetLookDirection(Vector2 lookDirection)
+    {
+        RpcSetLookDirection(lookDirection);
+    }
+
+    [ClientRpc]
+    void RpcSetLookDirection(Vector2 lookDirection)
+    {
+        this.lookDirection = lookDirection;
     }
 
     void OnTriggerEnter2D(Collider2D coll)

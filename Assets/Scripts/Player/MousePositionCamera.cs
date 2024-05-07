@@ -28,7 +28,7 @@ public class MousePositionCamera : NetworkBehaviour
         targetPos.x = Mathf.Clamp(targetPos.x, -_threshold + _player.position.x, _threshold + _player.position.x);
         targetPos.y = Mathf.Clamp(targetPos.y, -_threshold + _player.position.y, _threshold + _player.position.y);
 
-        _camera.transform.position = targetPos;
+        this.transform.position = targetPos;
 
         _ = Input.GetKey(KeyCode.LeftShift) ? _threshold = 3 : _threshold = 0;
     }
