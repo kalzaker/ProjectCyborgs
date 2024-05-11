@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class Wall : MonoBehaviour, IHitable
+public class HitableObject : MonoBehaviour, IHitable
 {
     public void Hit()
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Pathfinding;
+using Mirror;
 
-public class Enemy : MonoBehaviour
+public class Enemy : NetworkBehaviour, IHitable
 {
     StateMachine stateMachine;
     IAstarAI agent;
@@ -17,10 +18,19 @@ public class Enemy : MonoBehaviour
     [SerializeField] string currentState;
     [SerializeField] GameObject debugPlayerPosPoint;
 
+    [SyncVar]
+    Vector2 lookDirection;
+
+
+
     [Header("Weapon")]
-    public Transform Gun;
-    [Range(.1f, 10f)]
-    public float fireRate;
+    [SerializeField]
+    GameObject weaponToSpawn;
+
+    [SyncVar]
+    public Weapon weapon;
+
+    [SerializeField] Transform firePoint;
 
     void Start()
     {
@@ -28,21 +38,71 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<IAstarAI>();
         stateMachine.Initialise();
         fow = GetComponent<FieldOfView>();
+
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        CmdSpawnGun();
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdSpawnGun()
+    {
+        GameObject tempWeapon = Instantiate(weaponToSpawn, transform.position, Quaternion.identity);
+        NetworkServer.Spawn(tempWeapon);
+
+        RpcAssignWeapon(tempWeapon);
+    }
+
+    [ClientRpc]
+    void RpcAssignWeapon(GameObject weaponObject)
+    {
+        weapon = weaponObject.GetComponent<Weapon>();
+        weapon.pickUpAvailable = true;
+        weapon.PickUp(transform, firePoint.localPosition);
     }
 
     void Update()
     {
+        if (!isServer) return;
         CanSeePlayer();
         currentState = stateMachine.activeState.ToString();
         debugPlayerPosPoint.transform.position = lastPlayerKnownPos;
+
+
+        if (weapon == null) return;
+        weapon.SetLookDirection(firePoint.transform.position - gameObject.transform.position);
     }
 
     public bool CanSeePlayer()
     {
-        if(fow.visibleTargets.Count > 0)
+        return fow.visibleTargets.Count > 0;
+    }
+
+    
+    public void Hit()
+    {
+        CmdHit();
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdHit()
+    {
+        Die();
+    }
+
+    void Die()
+    {
+        if (weapon != null)
         {
-            return true;
+            weapon.RpcDrop(0);
+            weapon.Drop(0);
+            weapon = null;
         }
-        return false;
+
+        Destroy(gameObject);
     }
 }

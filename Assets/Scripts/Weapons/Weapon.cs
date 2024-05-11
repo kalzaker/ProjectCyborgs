@@ -18,8 +18,8 @@ public abstract class Weapon : NetworkBehaviour
 
     [SyncVar]
     bool canAttack;
+    public bool isInEnemiesHands;
 
-    [SyncVar]
     [SerializeField] public Vector2 lookDirection;
 
     [SerializeField] protected Transform attackPoint;
@@ -37,6 +37,7 @@ public abstract class Weapon : NetworkBehaviour
         if (timeBetweenAttacks >= 0)
         {
             timeBetweenAttacks -= Time.deltaTime;
+            Debug.Log(timeBetweenAttacks);
         }
         if(flyingTime > 0)
         {
@@ -44,50 +45,65 @@ public abstract class Weapon : NetworkBehaviour
         }
     }
 
+
     [Command(requiresAuthority = false)]
     public void CmdPickUp(Transform attachmentPoint, Vector2 attackPointPosition)
     {
-        RpcPickUp(attachmentPoint, attackPointPosition);
+        PickUp(attachmentPoint, attackPointPosition);
     }
 
     [ClientRpc]
-    void RpcPickUp(Transform attachmentPoint, Vector2 attackPointPosition)
+    public void RpcPickUp(Transform attachmentPoint, Vector2 attackPointPosition)
     {
-        Debug.Log("PickUp");
-        if (!pickUpAvailable) return;
-        this.transform.SetParent(attachmentPoint);
-        this.gameObject.transform.localPosition = attackPointPosition;
-        //attackPoint.localPosition = attackPointPosition;
-        transform.rotation = attachmentPoint.rotation;
-        pickUpAvailable = false;
-        canAttack = true;
+        PickUp(attachmentPoint,attackPointPosition);
+    }
+
+    public void PickUp(Transform attachmentPoint, Vector2 attackPointPosition)
+    {
+        if (pickUpAvailable)
+        {
+            Debug.Log("PickUp");
+            GetComponent<SpriteRenderer>().enabled = false;
+            this.transform.SetParent(attachmentPoint);
+
+            this.gameObject.transform.localPosition = attackPointPosition;
+            transform.rotation = attachmentPoint.rotation;
+            pickUpAvailable = false;
+            canAttack = true;
+            Debug.Log(attachmentPoint);
+        }
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdDrop()
+    public void CmdDrop(float localFlyingTime)
     {
-        RpcDrop();
+        Drop(localFlyingTime);
     }
 
     [ClientRpc]
-    void RpcDrop()
+    public void RpcDrop(float localFlyingTime)
     {
+        Drop(localFlyingTime);
+    }
+
+    public void Drop(float localFlyingTime)
+    {
+        GetComponent<SpriteRenderer>().enabled = true;
         Debug.Log("Drop");
         canAttack = false;
         this.gameObject.transform.parent = null;
-        flyingTime = 1.2f;
+        flyingTime = localFlyingTime;
+    }
+
+    public void Attack(Vector2 shootDirection)
+    {
+        CmdAttack(shootDirection);
     }
 
     [Command(requiresAuthority = false)]
     public virtual void CmdAttack(Vector2 shootDirection)
     {
         if (!canAttack) return;
-    }
-
-    [Command(requiresAuthority = false)]
-    void CmdFly()
-    {
-        Fly();
     }
 
     void Fly()
@@ -108,17 +124,24 @@ public abstract class Weapon : NetworkBehaviour
     [Command(requiresAuthority = false)]
     public void CmdSetLookDirection(Vector2 lookDirection)
     {
-        RpcSetLookDirection(lookDirection);
+        SetLookDirection(lookDirection);
     }
 
     [ClientRpc]
-    void RpcSetLookDirection(Vector2 lookDirection)
+    public void RpcSetLookDirection(Vector2 lookDirection)
+    {
+        SetLookDirection(lookDirection);
+    }
+
+    public void SetLookDirection(Vector2 lookDirection)
     {
         this.lookDirection = lookDirection;
     }
 
     void OnTriggerEnter2D(Collider2D coll)
     {
+        if (coll.TryGetComponent<Player>(out _)) return;
+
         if (coll.TryGetComponent<IHitable>(out IHitable target) && flyingTime > 0)
         {
             target.Hit();

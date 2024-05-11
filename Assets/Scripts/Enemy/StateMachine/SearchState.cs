@@ -1,13 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public class SearchState : BaseState
 {
+    [SyncVar]
     float searchTimer;
+    [SyncVar]
     float moveTimer;
     public override void Enter()
     {
+        if (!isServer) return;
         enemy.Agent.destination = enemy.LastPlayerKnownPos;
     }
 
@@ -18,8 +22,9 @@ public class SearchState : BaseState
 
     public override void Perform()
     {
+        if (!isServer) return;
         if (enemy.CanSeePlayer())
-            stateMachine.ChangeState(new AttackState());
+            stateMachine.ChangeState(GetComponent<AttackState>());
 
         if(enemy.Agent.reachedDestination)
         {
@@ -27,7 +32,7 @@ public class SearchState : BaseState
 
             if (searchTimer > 3)
             {
-                stateMachine.ChangeState(new PatrolState());
+                stateMachine.ChangeState(GetComponent<PatrolState>());
             }
         }
 

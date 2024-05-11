@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 
 public class AttackState : BaseState
 {
+    [SyncVar]
     float moveTimer;
+    [SyncVar]
     float losePlayerTimer;
-    float shotTimer;
+
 
     public override void Enter()
     {
@@ -21,15 +24,15 @@ public class AttackState : BaseState
 
     public override void Perform()
     {
+        if (!isServer) return;
         if (enemy.CanSeePlayer())
         {
+            Debug.Log("PISKI");
+            Shoot();
+
             losePlayerTimer = 0;
-            shotTimer += Time.deltaTime;
 
             enemy.Agent.destination = enemy.fow.visibleTargets[0].position;
-
-            if (shotTimer > enemy.fireRate)
-                Shoot();
 
             enemy.LastPlayerKnownPos = enemy.fow.visibleTargets[0].position;
         }
@@ -38,7 +41,7 @@ public class AttackState : BaseState
             losePlayerTimer += Time.deltaTime;
             if(losePlayerTimer > 4)
             {
-                stateMachine.ChangeState(new SearchState());
+                stateMachine.ChangeState(GetComponent<SearchState>());
             }
         }
 
@@ -46,12 +49,6 @@ public class AttackState : BaseState
 
     public void Shoot()
     {
-        Transform gun = enemy.Gun;
-        GameObject bullet = GameObject.Instantiate(Resources.Load("Objects/Enemy/Gun/EnemyBullet") as GameObject, gun.position, enemy.transform.rotation);
-        Vector2 shootDirection = (enemy.fow.visibleTargets[0].position - enemy.transform.position).normalized;
-        float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
-        bullet.GetComponent<Rigidbody2D>().velocity = Quaternion.AngleAxis(Random.Range(-3f,3f),Vector2.up) * shootDirection * 40;
-        Debug.Log("¡¿Ã ¡Àﬂ");
-        shotTimer = 0;
+        enemy.weapon.GetComponent<Weapon>().CmdAttack(enemy.fow.visibleTargets[0].position - enemy.transform.position);
     }
 }

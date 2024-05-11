@@ -8,6 +8,7 @@ public class Movement : NetworkBehaviour
 {
     [SerializeField] float _moveSpeed = 5f;
     [SerializeField] LayerMask gunMask;
+    [SerializeField] LayerMask playerMask;
 
     Camera cam;
 
@@ -21,7 +22,7 @@ public class Movement : NetworkBehaviour
     Vector2 lookDirection;
 
     [SyncVar]
-    [SerializeField] Weapon gun;
+    [SerializeField] public Weapon _gun;
 
     [SerializeField] Transform firePoint;
 
@@ -43,7 +44,11 @@ public class Movement : NetworkBehaviour
 
         if (Input.GetButtonDown("Fire2"))
         {
-            DropGun();
+            if (CmdReanimateTeammate(_mousePosition))
+            {
+                return;
+            }
+            DropGun(1.2f);
             TryPickUpGun(_mousePosition);
         }
 
@@ -52,17 +57,20 @@ public class Movement : NetworkBehaviour
             Attack(_mousePosition);
         }
 
-        if(gun != null)
+        if (_gun != null)
         {
-            gun.CmdSetLookDirection(lookDirection);
+            _gun.CmdSetLookDirection(lookDirection);
         }
     }
 
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
-        _movement.x = Input.GetAxisRaw("Horizontal");
-        _movement.y = Input.GetAxisRaw("Vertical");
+        if (GetComponent<Player>().alive)
+        {
+            _movement.x = Input.GetAxisRaw("Horizontal");
+            _movement.y = Input.GetAxisRaw("Vertical");
+        }
 
         lookDirection = _mousePosition - _rigidbody.position;
         _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
@@ -75,26 +83,61 @@ public class Movement : NetworkBehaviour
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, gunMask);
         if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= .8f)
         {
-            Debug.Log("Zaszel wpopu");
-            gun = hit.collider.GetComponent<Weapon>();
-            if (!gun.pickUpAvailable) return;
-            firePointPosition = firePoint.localPosition;
-            gun.CmdPickUp(transform, firePointPosition);
-            //CmdPickUpGun(hit);
+            if (hit.collider.TryGetComponent<Weapon>(out Weapon gun))
+            {
+                Debug.Log("Zaszel wpopu");
+
+                _gun = gun;
+
+                if (!gun.pickUpAvailable)
+                {
+                    gun = null;
+                    return;
+                }
+                gun.CmdPickUp(transform, firePoint.localPosition);
+                gun.RpcPickUp(transform, firePoint.localPosition);
+                gun.PickUp(transform, firePoint.localPosition);
+            }
         }
     }
 
-    void DropGun()
+    public void DropGun(float gunFlyTime)
     {
         Debug.Log("CmdDropGun");
-        if (gun == null) return;
-        gun.CmdDrop();
-        gun = null;
+        if (_gun == null) return;
+        _gun.CmdDrop(gunFlyTime);
+        _gun.RpcDrop(gunFlyTime);
+        _gun.Drop(gunFlyTime);
+        _gun = null;
     }
-    
+
     void Attack(Vector2 mousePos)
     {
-        if (gun == null) return;
-        gun.CmdAttack(mousePos - _rigidbody.position);
+        if (_gun == null) return;
+        _gun.CmdAttack(mousePos - _rigidbody.position);
+    }
+
+    public bool CmdReanimateTeammate(Vector2 mousePos)
+    {
+        if (!GetComponent<Player>().alive)
+        {
+            Debug.Log("False");
+            return false;
+        }
+
+        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, playerMask);
+        if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= .8f)
+        {
+            if (hit.collider.TryGetComponent<Player>(out Player player))
+            {
+                if (player.alive) return false;
+                player.alive = true;
+                Debug.Log("True");
+                return true;
+            }
+        }
+
+        Debug.Log("False");
+        return false;
     }
 }

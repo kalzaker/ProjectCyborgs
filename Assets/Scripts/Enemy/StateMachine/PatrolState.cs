@@ -2,13 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.RuleTile.TilingRuleOutput;
+using Mirror;
 
 public class PatrolState : BaseState
 {
+    [SyncVar]
     float waitTimer;
+    [SyncVar]
     public int WaypointIndex;
     public override void Enter()
     {
+        if (!isServer) return;
         enemy.Agent.destination = enemy.path.waypoints[0].position;
     }
 
@@ -19,16 +23,18 @@ public class PatrolState : BaseState
 
     public override void Perform()
     {
+        //if (!isServer) return;
         PatrolCycle();
         if(enemy.CanSeePlayer())
         {
-            stateMachine.ChangeState(new AttackState());
+            stateMachine.ChangeState(GetComponent<AttackState>());
         }
     }
 
     public void PatrolCycle()
     {
-        if(enemy.Agent.reachedDestination)
+        //if (!isServer) return;
+        if (enemy.Agent.reachedDestination)
         {
             waitTimer += Time.deltaTime;
 

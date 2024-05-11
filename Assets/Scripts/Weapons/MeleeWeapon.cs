@@ -16,10 +16,13 @@ public class MeleeWeapon : Weapon
         
         foreach (Collider2D collider in hitColliders)
         {
-            if(TryGetComponent<IHitable>(out IHitable target))
+            if(collider.TryGetComponent<IHitable>(out IHitable target))
             {
-                target.Hit();
-                Debug.Log("GAY");
+                if (!collider.TryGetComponent<Player>(out _))
+                {
+                    target.Hit();
+                    Debug.Log("GAY");
+                }
             }
         }
     }

@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class FieldOfView : MonoBehaviour
+public class FieldOfView : NetworkBehaviour
 {
     public float viewRadius;
     [Range(0, 360)]
@@ -12,15 +13,18 @@ public class FieldOfView : MonoBehaviour
     public LayerMask wallMask;
 
     [HideInInspector]
+    [SyncVar]
     public List<Transform> visibleTargets = new List<Transform>();
 
     void Start()
     {
+        if (!isServer) return;
         StartCoroutine("FindTargetsWithDelay", .2f);
     }
 
     IEnumerator FindTargetsWithDelay(float delay)
     {
+        if (!isServer) yield return null;
         while (true)
         {
             yield return new WaitForSeconds(delay);
@@ -30,6 +34,7 @@ public class FieldOfView : MonoBehaviour
     
     void FindVisibleTargets()
     {
+        if (!isServer) return;
         visibleTargets.Clear();
 
         Collider2D[] targetsInViewRadius = Physics2D.OverlapCircleAll(transform.position, viewRadius, targetMask);

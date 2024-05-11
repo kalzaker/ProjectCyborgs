@@ -8,7 +8,9 @@ public class RangedWeapon : Weapon
     [SerializeField] protected float ammo, attackCooldown, spray, bulletSpeed, bulletsPerShoot;
 
     [SyncVar]
-    float shift;
+    float shiftX;
+    [SyncVar]
+    float shiftY;
 
     [SerializeField] protected GameObject _bullet;
 
@@ -29,12 +31,14 @@ public class RangedWeapon : Weapon
             timeBetweenAttacks = attackCooldown;
             for (int i = 0; i < bulletsPerShoot; i++)
             {
-                shift = Random.Range(-spray, spray);
-                Vector2 bulletDirection = new Vector2(shootDirection.x + shift, shootDirection.y + shift);
+                shiftX = Random.Range(-spray, spray);
+                shiftY = Random.Range(-spray, spray);
+                Vector2 bulletDirection = new Vector2(shootDirection.x + shiftX*shootDirection.x, shootDirection.y + shiftY*shootDirection.y);
                 GameObject bullet = Instantiate(_bullet, attackPoint.position, Quaternion.LookRotation(Vector3.forward, bulletDirection));
                 NetworkServer.Spawn(bullet);
                 bullet.GetComponent<Rigidbody2D>().velocity = bulletDirection.normalized * bulletSpeed;
             }
         }
+        if (isInEnemiesHands) ammo++;
     }
 }

@@ -10,12 +10,15 @@ public class PlayerBullet : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        DestroyBullet();
-        if (!collision.gameObject.TryGetComponent<IHitable>(out IHitable target))
+        if (collision.gameObject.TryGetComponent<IHitable>(out IHitable target))
         {
-            return;
+            if (collision.gameObject.TryGetComponent<Player>(out _))
+            {
+                return;
+            }
+            DestroyBullet();
+            target.Hit();
         }
-        target.Hit();
     }
 
     void DestroyBullet()
