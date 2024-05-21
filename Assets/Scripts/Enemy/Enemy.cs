@@ -21,6 +21,8 @@ public class Enemy : NetworkBehaviour, IHitable
     [SyncVar]
     Vector2 lookDirection;
 
+    public bool canSeePlayer;
+
 
 
     [Header("Weapon")]
@@ -61,14 +63,15 @@ public class Enemy : NetworkBehaviour, IHitable
     void RpcAssignWeapon(GameObject weaponObject)
     {
         weapon = weaponObject.GetComponent<Weapon>();
-        weapon.pickUpAvailable = true;
+        weapon.isInEnemiesHands = true;
+
         weapon.PickUp(transform, firePoint.localPosition);
+
     }
 
     void Update()
     {
         if (!isServer) return;
-        CanSeePlayer();
         currentState = stateMachine.activeState.ToString();
         debugPlayerPosPoint.transform.position = lastPlayerKnownPos;
 
@@ -91,14 +94,14 @@ public class Enemy : NetworkBehaviour, IHitable
     [Command(requiresAuthority = false)]
     void CmdHit()
     {
-        Die();
+        RpcDie();
     }
 
-    void Die()
+    [ClientRpc]
+    void RpcDie()
     {
         if (weapon != null)
         {
-            weapon.RpcDrop(0);
             weapon.Drop(0);
             weapon = null;
         }

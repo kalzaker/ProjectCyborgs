@@ -106,6 +106,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
   pickUpAvailable: 1
   isInEnemiesHands: 0
   lookDirection: {x: 0, y: 0}
@@ -115,6 +118,7 @@ MonoBehaviour:
   spray: 0.1
   bulletSpeed: 20
   bulletsPerShoot: 1
+  soundRange: 5
   _bullet: {fileID: 1941777009891542158, guid: 1cdee9b175fec0d478d04eb6dc9852b9, type: 3}
 --- !u!61 &6979017744657661801
 BoxCollider2D:

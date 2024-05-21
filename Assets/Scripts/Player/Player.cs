@@ -5,26 +5,19 @@ using Mirror;
 
 public class Player : NetworkBehaviour, IHitable
 {
-    float timeTillDeath;
+    //float timeTillDeath;
     [SyncVar]
     public bool alive;
 
     void Start()
     {
         alive = true;
-        timeTillDeath = 10f;
+        //timeTillDeath = 10f;
     }
 
     void Update()
     {
-        if(alive) return;
-        if(!alive)
-        {
-            timeTillDeath -= Time.deltaTime;
-        }
-
-        if (timeTillDeath <= 0)
-            Die();
+        
     }
 
     
@@ -38,10 +31,15 @@ public class Player : NetworkBehaviour, IHitable
     {
         alive = false;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        Die();
     }
 
     void Die()
     {
+        GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        //GetComponent<Rigidbody2D>().enabled = false;
         Debug.Log("PIZDA");
+
+        //Time.timeScale = 0;
     }
 }

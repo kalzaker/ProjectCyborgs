@@ -6,6 +6,8 @@ using Mirror;
 
 public abstract class Weapon : NetworkBehaviour
 {
+    [SerializeField] protected LayerMask enemyLayer;
+
     Rigidbody2D rb;
 
     [SyncVar]
@@ -41,11 +43,29 @@ public abstract class Weapon : NetworkBehaviour
         }
         if(flyingTime > 0)
         {
+            Debug.Log(flyingTime);
             Fly();
         }
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdSetLookDirection(Vector2 lookDirection)
+    {
+        SetLookDirection(lookDirection);
+    }
 
+    [ClientRpc]
+    public void RpcSetLookDirection(Vector2 lookDirection)
+    {
+        SetLookDirection(lookDirection);
+    }
+
+    public void SetLookDirection(Vector2 lookDirection)
+    {
+        this.lookDirection = lookDirection;
+    }
+
+    //------------PICK UP-------------
     [Command(requiresAuthority = false)]
     public void CmdPickUp(Transform attachmentPoint, Vector2 attackPointPosition)
     {
@@ -68,12 +88,15 @@ public abstract class Weapon : NetworkBehaviour
 
             this.gameObject.transform.localPosition = attackPointPosition;
             transform.rotation = attachmentPoint.rotation;
-            pickUpAvailable = false;
+            this.pickUpAvailable = false;
+            Debug.Log(pickUpAvailable);
             canAttack = true;
             Debug.Log(attachmentPoint);
         }
     }
 
+
+    //----------DROP----------
     [Command(requiresAuthority = false)]
     public void CmdDrop(float localFlyingTime)
     {
@@ -93,17 +116,7 @@ public abstract class Weapon : NetworkBehaviour
         canAttack = false;
         this.gameObject.transform.parent = null;
         flyingTime = localFlyingTime;
-    }
-
-    public void Attack(Vector2 shootDirection)
-    {
-        CmdAttack(shootDirection);
-    }
-
-    [Command(requiresAuthority = false)]
-    public virtual void CmdAttack(Vector2 shootDirection)
-    {
-        if (!canAttack) return;
+        isInEnemiesHands = false;
     }
 
     void Fly()
@@ -121,23 +134,6 @@ public abstract class Weapon : NetworkBehaviour
         }
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdSetLookDirection(Vector2 lookDirection)
-    {
-        SetLookDirection(lookDirection);
-    }
-
-    [ClientRpc]
-    public void RpcSetLookDirection(Vector2 lookDirection)
-    {
-        SetLookDirection(lookDirection);
-    }
-
-    public void SetLookDirection(Vector2 lookDirection)
-    {
-        this.lookDirection = lookDirection;
-    }
-
     void OnTriggerEnter2D(Collider2D coll)
     {
         if (coll.TryGetComponent<Player>(out _)) return;
@@ -149,5 +145,17 @@ public abstract class Weapon : NetworkBehaviour
             flyingTime = 0;
             rb.velocity = Vector2.zero;
         }
+    }
+
+    //-------------ATTACK---------------
+    public void Attack(Vector2 shootDirection)
+    {
+        CmdAttack(shootDirection);
+    }
+
+    [Command(requiresAuthority = false)]
+    public virtual void CmdAttack(Vector2 shootDirection)
+    {
+        if (!canAttack) return;
     }
 }

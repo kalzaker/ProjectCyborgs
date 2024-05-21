@@ -6,7 +6,6 @@ using Mirror;
 public class MeleeWeapon : Weapon
 {
     [SerializeField] protected float attackRange;
-    [SerializeField] protected LayerMask enemyLayer;
 
     [Command(requiresAuthority = false)]
     public override void CmdAttack(Vector2 shootDirection)

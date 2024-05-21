@@ -50,6 +50,10 @@ public class FieldOfView : NetworkBehaviour
 
                 if(!Physics2D.Raycast(transform.position, dirToTarget, dstToTarget, wallMask))
                 {
+                    if(target.TryGetComponent<Player>(out Player player))
+                    {
+                        if (!player.alive) return;
+                    }
                     visibleTargets.Add(target);
                 }
             }

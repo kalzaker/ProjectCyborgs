@@ -8,7 +8,7 @@ public class Movement : NetworkBehaviour
 {
     [SerializeField] float _moveSpeed = 5f;
     [SerializeField] LayerMask gunMask;
-    [SerializeField] LayerMask playerMask;
+    [SerializeField] LayerMask usableObjectMask;
 
     Camera cam;
 
@@ -18,6 +18,8 @@ public class Movement : NetworkBehaviour
 
     [SyncVar]
     Vector2 _mousePosition;
+
+    bool skipWeaponActions;
 
     Vector2 lookDirection;
 
@@ -44,13 +46,14 @@ public class Movement : NetworkBehaviour
 
         if (Input.GetButtonDown("Fire2"))
         {
-            if (CmdReanimateTeammate(_mousePosition))
+            UseObject(_mousePosition);
+            if (!skipWeaponActions)
             {
-                return;
+                DropGun(1.2f);
+                TryPickUpGun(_mousePosition);
             }
-            DropGun(1.2f);
-            TryPickUpGun(_mousePosition);
         }
+        skipWeaponActions = false;
 
         if (Input.GetButton("Fire1"))
         {
@@ -70,6 +73,10 @@ public class Movement : NetworkBehaviour
         {
             _movement.x = Input.GetAxisRaw("Horizontal");
             _movement.y = Input.GetAxisRaw("Vertical");
+        }
+        else
+        {
+            _rigidbody.velocity = Vector2.zero;
         }
 
         lookDirection = _mousePosition - _rigidbody.position;
@@ -117,7 +124,8 @@ public class Movement : NetworkBehaviour
         _gun.CmdAttack(mousePos - _rigidbody.position);
     }
 
-    public bool CmdReanimateTeammate(Vector2 mousePos)
+    // Œƒ √Œ¬Õ¿
+    /*public bool CmdReanimateTeammate(Vector2 mousePos)
     {
         if (!GetComponent<Player>().alive)
         {
@@ -139,5 +147,19 @@ public class Movement : NetworkBehaviour
 
         Debug.Log("False");
         return false;
+    }*/
+
+    void UseObject(Vector2 mousePos)
+    {
+        Debug.Log("UseObject");
+        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, usableObjectMask);
+        if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= 2f)
+        {
+            if (hit.collider.TryGetComponent<IUsableObject>(out IUsableObject usableObject))
+            {
+                usableObject.Use();
+                skipWeaponActions = true;
+            }
+        }
     }
 }

@@ -2367,6 +2367,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2172204206667216060, guid: 34147fdd13cb201418d80132ec4a5905, type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 5162832520018566674, guid: 34147fdd13cb201418d80132ec4a5905, type: 3}
       propertyPath: sceneId
       value: 293230488
@@ -2907,8 +2911,8 @@ MonoBehaviour:
   sendRate: 60
   autoStartServerBuild: 0
   autoConnectClientBuild: 0
-  offlineScene: 
-  onlineScene: 
+  offlineScene: Assets/Scenes/MainMenu.unity
+  onlineScene: Assets/Scenes/SampleScene.unity
   transport: {fileID: 934625147}
   networkAddress: localhost
   maxConnections: 2
@@ -3244,6 +3248,10 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 2172204206667216060, guid: 34147fdd13cb201418d80132ec4a5905, type: 3}
+      propertyPath: soundRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2172204206667216060, guid: 34147fdd13cb201418d80132ec4a5905, type: 3}
       propertyPath: bulletSpeed
       value: 60
       objectReference: {fileID: 0}
@@ -3405,6 +3413,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1384687206
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 12.771817
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.0021021
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 885793052491952314, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4596031377796531575, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
+      propertyPath: m_Name
+      value: Door
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e38a96f8e0c9c914184334a771d86d7a, type: 3}
 --- !u!1 &1415774052
 GameObject:
   m_ObjectHideFlags: 0
@@ -3637,6 +3702,14 @@ PrefabInstance:
     - target: {fileID: 1602700413756984163, guid: 31484f93862c75546ac0289981028bd6, type: 3}
       propertyPath: sceneId
       value: 2593580243
+      objectReference: {fileID: 0}
+    - target: {fileID: 2445596577613987557, guid: 31484f93862c75546ac0289981028bd6, type: 3}
+      propertyPath: viewAngle
+      value: 143
+      objectReference: {fileID: 0}
+    - target: {fileID: 2445596577613987557, guid: 31484f93862c75546ac0289981028bd6, type: 3}
+      propertyPath: viewRadius
+      value: 8.39
       objectReference: {fileID: 0}
     - target: {fileID: 3656431530090067310, guid: 31484f93862c75546ac0289981028bd6, type: 3}
       propertyPath: alwaysDrawGizmos
@@ -7913,3 +7986,4 @@ SceneRoots:
   - {fileID: 542152522}
   - {fileID: 1299909205}
   - {fileID: 41006086}
+  - {fileID: 1384687206}

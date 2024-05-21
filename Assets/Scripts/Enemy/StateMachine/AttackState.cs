@@ -9,7 +9,7 @@ public class AttackState : BaseState
     [SyncVar]
     float moveTimer;
     [SyncVar]
-    float losePlayerTimer;
+    public float losePlayerTimer;
 
 
     public override void Enter()

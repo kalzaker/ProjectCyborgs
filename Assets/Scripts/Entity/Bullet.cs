@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBullet : MonoBehaviour
+public class Bullet : MonoBehaviour
 {
+    public bool isEnemyBullet;
+
     void Start()
     {
         Invoke("DestroyBullet", 7f);
@@ -12,7 +14,11 @@ public class PlayerBullet : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<IHitable>(out IHitable target))
         {
-            if (collision.gameObject.TryGetComponent<Player>(out _))
+            if (collision.gameObject.TryGetComponent<Enemy>(out _) && isEnemyBullet)
+            {
+                return;
+            }
+            if (collision.gameObject.TryGetComponent<Player>(out _) && !isEnemyBullet)
             {
                 return;
             }

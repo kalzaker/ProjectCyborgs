@@ -139,9 +139,9 @@ MonoBehaviour:
   gunMask:
     serializedVersion: 2
     m_Bits: 256
-  playerMask:
+  usableObjectMask:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 512
   _gun: {fileID: 0}
   firePoint: {fileID: 1317663786445525651}
 --- !u!114 &-7660984416088186214
