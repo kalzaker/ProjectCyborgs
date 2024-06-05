@@ -5,6 +5,8 @@ using Mirror;
 
 public class RangedWeapon : Weapon
 {
+    [SerializeField] AudioClip noAmmoSound;
+
     [SerializeField] protected float ammo, attackCooldown, spray, bulletSpeed, bulletsPerShoot;
 
     [SyncVar]
@@ -45,13 +47,15 @@ public class RangedWeapon : Weapon
             }
         }
         if (isInEnemiesHands) ammo++;
+        if(ammo <= 0)
+        {
+            audioPlayer.PlaySound(noAmmoSound);
+        }
     }
 
     void MakeSound()
     {
-        //SOUNDS
-
-
+        audioPlayer.PlaySound(attackSound);
 
         //Enemy hear sounds
         if (isInEnemiesHands) return;

@@ -8,10 +8,12 @@ public class Player : NetworkBehaviour, IHitable
     //float timeTillDeath;
     [SyncVar]
     public bool alive;
+    public bool canMove;
 
     void Start()
     {
         alive = true;
+        canMove = true;
         //timeTillDeath = 10f;
     }
 
@@ -29,16 +31,15 @@ public class Player : NetworkBehaviour, IHitable
     [Command(requiresAuthority = false)]
     void CmdHit()
     {
-        alive = false;
-        GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         Die();
     }
 
     void Die()
     {
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        alive = false;
+        canMove= false;
         //GetComponent<Rigidbody2D>().enabled = false;
-        Debug.Log("PIZDA");
 
         //Time.timeScale = 0;
     }

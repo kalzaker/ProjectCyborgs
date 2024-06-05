@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Pathfinding;
 using Mirror;
+using System;
 
 public class Enemy : NetworkBehaviour, IHitable
 {
@@ -16,7 +17,7 @@ public class Enemy : NetworkBehaviour, IHitable
 
     public Path path;
     [SerializeField] string currentState;
-    [SerializeField] GameObject debugPlayerPosPoint;
+    public GameObject debugPlayerPosPoint;
 
     [SyncVar]
     Vector2 lookDirection;
@@ -34,8 +35,15 @@ public class Enemy : NetworkBehaviour, IHitable
 
     [SerializeField] Transform firePoint;
 
+    public event Action<Enemy> OnEnemyKilled;
+
     void Start()
     {
+        if (isServer)
+        {
+            EnemyManager.Instance.RegisterEnemy(this);
+        }
+
         stateMachine = GetComponent<StateMachine>();
         agent = GetComponent<IAstarAI>();
         stateMachine.Initialise();
@@ -66,7 +74,8 @@ public class Enemy : NetworkBehaviour, IHitable
         weapon.isInEnemiesHands = true;
 
         weapon.PickUp(transform, firePoint.localPosition);
-
+        weapon.pickUpAvailable = false;
+        EnemyManager.Instance.enemiesWeapons.Add(weapon);
     }
 
     void Update()
@@ -94,11 +103,10 @@ public class Enemy : NetworkBehaviour, IHitable
     [Command(requiresAuthority = false)]
     void CmdHit()
     {
-        RpcDie();
+        Die();
     }
 
-    [ClientRpc]
-    void RpcDie()
+    void Die()
     {
         if (weapon != null)
         {
@@ -106,6 +114,7 @@ public class Enemy : NetworkBehaviour, IHitable
             weapon = null;
         }
 
-        Destroy(gameObject);
+        OnEnemyKilled?.Invoke(this);
+        NetworkServer.Destroy(gameObject);
     }
 }

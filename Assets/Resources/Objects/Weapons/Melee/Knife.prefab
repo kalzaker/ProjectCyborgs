@@ -85,14 +85,21 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
   pickUpAvailable: 1
   isInEnemiesHands: 0
   lookDirection: {x: 0, y: 0}
   attackPoint: {fileID: 1812048759984765109}
+  attackAudioSource: {fileID: 0}
+  pickUpAudioSource: {fileID: 0}
+  dropAudioSource: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: 3ab78330a07fc1b428bedd6b50b81e7b, type: 3}
+  pickUpSound: {fileID: 8300000, guid: 5c0df69ca8e49f5488e35de33df3af3a, type: 3}
+  dropSound: {fileID: 8300000, guid: 3ab78330a07fc1b428bedd6b50b81e7b, type: 3}
   attackRange: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
+  hitSound: {fileID: 8300000, guid: bd150423a162a22429eb1cfbd5b2361f, type: 3}
 --- !u!114 &5111489152899604424
 MonoBehaviour:
   m_ObjectHideFlags: 0

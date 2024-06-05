@@ -7,6 +7,11 @@ public class DoorController : MonoBehaviour, IHitable
     [SerializeField] float speed = 10f; // Скорость движения двери
     [SerializeField]private ProximityDetector proximityDetector; // Скрипт для детектирования объектов рядом
 
+    [SerializeField] AudioClip doorClosing;
+    [SerializeField] AudioClip doorOpening;
+
+    [SerializeField]AudioSource doorSound;
+
     private void Start()
     {
         // Найти объект, который содержит ProximityDetector

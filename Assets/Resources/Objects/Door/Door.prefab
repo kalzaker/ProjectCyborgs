@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3710106765089365062}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: openPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 885793052491952314}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0, z: 0}
-  m_LocalScale: {x: 1, y: 1.5, z: 1}
+  m_LocalScale: {x: 1, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 697542451020838586}
@@ -75,7 +75,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2072591498999167654}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: closePosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 4650003476554070703}
   - component: {fileID: 2551384805412390364}
   - component: {fileID: 4122111748196444667}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DoorObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,6 +244,9 @@ MonoBehaviour:
   closedPosition: {fileID: 2072591498999167654}
   speed: 5
   proximityDetector: {fileID: 5979112431610062713}
+  doorClosing: {fileID: 0}
+  doorOpening: {fileID: 0}
+  doorSound: {fileID: 0}
 --- !u!1 &7975230061580392326
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,7 +258,7 @@ GameObject:
   - component: {fileID: 697542451020838586}
   - component: {fileID: 5979112431610062713}
   - component: {fileID: 2613780092762944970}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ProximityDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -113,6 +113,13 @@ MonoBehaviour:
   isInEnemiesHands: 0
   lookDirection: {x: 0, y: 0}
   attackPoint: {fileID: 5713725805446868539}
+  attackAudioSource: {fileID: 0}
+  pickUpAudioSource: {fileID: 0}
+  dropAudioSource: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: 225e2a3c451e48f42a817eda038aa378, type: 3}
+  pickUpSound: {fileID: 8300000, guid: c6c022a6aa42a9f4a9e08aaa40d99db3, type: 3}
+  dropSound: {fileID: 8300000, guid: 3ab78330a07fc1b428bedd6b50b81e7b, type: 3}
+  noAmmoSound: {fileID: 8300000, guid: 5d295529729d38647a8a6f3cc2629d2e, type: 3}
   ammo: 15
   attackCooldown: 0.3
   spray: 0.1

@@ -15,19 +15,30 @@ public abstract class Weapon : NetworkBehaviour
 
     protected float timeBetweenAttacks;
 
-    [SyncVar]
     public bool pickUpAvailable;
 
     [SyncVar]
     bool canAttack;
     public bool isInEnemiesHands;
 
+    [SyncVar]
     [SerializeField] public Vector2 lookDirection;
 
     [SerializeField] protected Transform attackPoint;
 
+    [SerializeField]
+    protected AudioClip attackSound;
+    [SerializeField]
+    protected AudioClip pickUpSound;
+    [SerializeField]
+    protected AudioClip dropSound;
+
+
+    protected AudioPlayer audioPlayer;
+
     void Start()
     {
+        audioPlayer = gameObject.AddComponent<AudioPlayer>();
         rb = GetComponent<Rigidbody2D>();
         pickUpAvailable = true;
     }
@@ -39,11 +50,9 @@ public abstract class Weapon : NetworkBehaviour
         if (timeBetweenAttacks >= 0)
         {
             timeBetweenAttacks -= Time.deltaTime;
-            Debug.Log(timeBetweenAttacks);
         }
         if(flyingTime > 0)
         {
-            Debug.Log(flyingTime);
             Fly();
         }
     }
@@ -82,16 +91,13 @@ public abstract class Weapon : NetworkBehaviour
     {
         if (pickUpAvailable)
         {
-            Debug.Log("PickUp");
             GetComponent<SpriteRenderer>().enabled = false;
             this.transform.SetParent(attachmentPoint);
 
             this.gameObject.transform.localPosition = attackPointPosition;
             transform.rotation = attachmentPoint.rotation;
             this.pickUpAvailable = false;
-            Debug.Log(pickUpAvailable);
             canAttack = true;
-            Debug.Log(attachmentPoint);
         }
     }
 
@@ -112,11 +118,12 @@ public abstract class Weapon : NetworkBehaviour
     public void Drop(float localFlyingTime)
     {
         GetComponent<SpriteRenderer>().enabled = true;
-        Debug.Log("Drop");
         canAttack = false;
         this.gameObject.transform.parent = null;
         flyingTime = localFlyingTime;
         isInEnemiesHands = false;
+
+        audioPlayer.PlaySound(dropSound);
     }
 
     void Fly()
@@ -134,11 +141,11 @@ public abstract class Weapon : NetworkBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D coll)
+    void OnCollisionEnter2D(Collision2D coll)
     {
-        if (coll.TryGetComponent<Player>(out _)) return;
+        if (coll.gameObject.TryGetComponent<Player>(out _)) return;
 
-        if (coll.TryGetComponent<IHitable>(out IHitable target) && flyingTime > 0)
+        if (coll.gameObject.TryGetComponent<IHitable>(out IHitable target) && flyingTime > 0)
         {
             target.Hit();
             pickUpAvailable = true;

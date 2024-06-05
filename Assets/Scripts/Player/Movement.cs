@@ -42,6 +42,8 @@ public class Movement : NetworkBehaviour
     void Update()
     {
         if (!isLocalPlayer) return;
+        if (!GetComponent<Player>().canMove) return;
+
         _mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetButtonDown("Fire2"))
@@ -69,15 +71,12 @@ public class Movement : NetworkBehaviour
     private void FixedUpdate()
     {
         if (!isLocalPlayer) return;
-        if (GetComponent<Player>().alive)
-        {
-            _movement.x = Input.GetAxisRaw("Horizontal");
-            _movement.y = Input.GetAxisRaw("Vertical");
-        }
-        else
-        {
+        if (!GetComponent<Player>().canMove) {
             _rigidbody.velocity = Vector2.zero;
+            return;
         }
+        _movement.x = Input.GetAxisRaw("Horizontal");
+        _movement.y = Input.GetAxisRaw("Vertical");
 
         lookDirection = _mousePosition - _rigidbody.position;
         _rigidbody.velocity = new Vector2(_movement.x, _movement.y).normalized * _moveSpeed;
@@ -102,7 +101,7 @@ public class Movement : NetworkBehaviour
                     return;
                 }
                 gun.CmdPickUp(transform, firePoint.localPosition);
-                gun.RpcPickUp(transform, firePoint.localPosition);
+                //gun.RpcPickUp(transform, firePoint.localPosition);
                 gun.PickUp(transform, firePoint.localPosition);
             }
         }
@@ -113,7 +112,7 @@ public class Movement : NetworkBehaviour
         Debug.Log("CmdDropGun");
         if (_gun == null) return;
         _gun.CmdDrop(gunFlyTime);
-        _gun.RpcDrop(gunFlyTime);
+        //_gun.RpcDrop(gunFlyTime);
         _gun.Drop(gunFlyTime);
         _gun = null;
     }
@@ -123,31 +122,6 @@ public class Movement : NetworkBehaviour
         if (_gun == null) return;
         _gun.CmdAttack(mousePos - _rigidbody.position);
     }
-
-    // Œƒ √Œ¬Õ¿
-    /*public bool CmdReanimateTeammate(Vector2 mousePos)
-    {
-        if (!GetComponent<Player>().alive)
-        {
-            Debug.Log("False");
-            return false;
-        }
-
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, playerMask);
-        if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= .8f)
-        {
-            if (hit.collider.TryGetComponent<Player>(out Player player))
-            {
-                if (player.alive) return false;
-                player.alive = true;
-                Debug.Log("True");
-                return true;
-            }
-        }
-
-        Debug.Log("False");
-        return false;
-    }*/
 
     void UseObject(Vector2 mousePos)
     {

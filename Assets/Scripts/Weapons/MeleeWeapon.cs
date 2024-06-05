@@ -7,6 +7,8 @@ public class MeleeWeapon : Weapon
 {
     [SerializeField] protected float attackRange;
 
+    [SerializeField] AudioClip hitSound;
+
     [Command(requiresAuthority = false)]
     public override void CmdAttack(Vector2 shootDirection)
     {
@@ -19,6 +21,8 @@ public class MeleeWeapon : Weapon
             {
                 if (!collider.TryGetComponent<Player>(out _))
                 {
+                    audioPlayer.PlaySound(hitSound);
+
                     target.Hit();
                     Debug.Log("GAY");
                 }

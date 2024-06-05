@@ -61,8 +61,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  viewRadius: 4.08
-  viewAngle: 58
+  viewRadius: 15
+  viewAngle: 100
   targetMask:
     serializedVersion: 2
     m_Bits: 8
