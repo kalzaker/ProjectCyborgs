@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class Path : MonoBehaviour
+[System.Serializable]
+public class Path
 {
-    public List<Transform> waypoints;
+    public List<Transform> waypoints = new List<Transform>();
 
     [SerializeField] bool alwaysDrawPath;
     [SerializeField] bool drawAsLoop;
     [SerializeField] bool drawNumbers;
 
     [SerializeField] Color debugColor = Color.white;
-
 #if UNITY_EDITOR
 
     public void OnDrawGizmos()

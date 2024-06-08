@@ -25,7 +25,6 @@ public class Enemy : NetworkBehaviour, IHitable
     public bool canSeePlayer;
 
 
-
     [Header("Weapon")]
     [SerializeField]
     GameObject weaponToSpawn;
@@ -54,7 +53,6 @@ public class Enemy : NetworkBehaviour, IHitable
     public override void OnStartClient()
     {
         base.OnStartClient();
-
         CmdSpawnGun();
     }
 
