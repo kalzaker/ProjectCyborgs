@@ -108,7 +108,7 @@ public class Enemy : NetworkBehaviour, IHitable
     {
         if (weapon != null)
         {
-            weapon.Drop(0);
+            weapon.RpcDrop(0);
             weapon = null;
         }
 

@@ -5,16 +5,17 @@ using Mirror;
 
 public class Player : NetworkBehaviour, IHitable
 {
-    //float timeTillDeath;
+
     [SyncVar]
     public bool alive;
+
+    [SyncVar]
     public bool canMove;
 
     void Start()
     {
         alive = true;
         canMove = true;
-        //timeTillDeath = 10f;
     }
 
     void Update()
@@ -31,6 +32,12 @@ public class Player : NetworkBehaviour, IHitable
     [Command(requiresAuthority = false)]
     void CmdHit()
     {
+        RpcDie();
+    }
+
+    [ClientRpc]
+    void RpcDie()
+    {
         Die();
     }
 
@@ -39,8 +46,7 @@ public class Player : NetworkBehaviour, IHitable
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         alive = false;
         canMove= false;
-        //GetComponent<Rigidbody2D>().enabled = false;
 
-        //Time.timeScale = 0;
+        EventManager.playerDied.Invoke();
     }
 }

@@ -49,6 +49,6 @@ public class AttackState : BaseState
 
     public void Shoot()
     {
-        enemy.weapon.GetComponent<Weapon>().CmdAttack(enemy.fow.visibleTargets[0].position - enemy.transform.position);
+        enemy.weapon.GetComponent<Weapon>().Attack(enemy.fow.visibleTargets[0].position - enemy.transform.position);
     }
 }

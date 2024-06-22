@@ -7,20 +7,21 @@ public class Teleporter : NetworkBehaviour
 {
     [SerializeField] Transform targetPosition;
 
-    [SerializeField] MapManager _mapManager;
-
     [SerializeField] Map map;
 
     [SerializeField] public bool isLobbyPortal;
 
-    
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (isLobbyPortal) return;
+        EnemyManager.Instance.AllEnemiesDefeated += ActivatePortal;
+        gameObject.SetActive(false);
+    }
     
     void Start()
     {
-        GameObject mapManager = GameObject.Find("MapManager");
-        _mapManager = mapManager.GetComponent<MapManager>();
-        if (isLobbyPortal) return;
-        EnemyManager.Instance.AllEnemiesDefeated += ActivatePortal;
+        
     }
 
     void OnTriggerEnter2D(Collider2D coll)
@@ -29,14 +30,14 @@ public class Teleporter : NetworkBehaviour
         if(coll.TryGetComponent<Player>(out Player player))
         {
             NetworkIdentity playerNetId = player.GetComponent<NetworkIdentity>();
-            if (playerNetId != null && _mapManager.needToSpawnMap)
+            if (playerNetId != null && MapManager.Instance.needToSpawnMap)
             {
-                _mapManager.SpawnRandomMap();
+                MapManager.Instance.SpawnRandomMap();
             }
-            _mapManager.TeleportPlayer(this.GetComponent<Teleporter>());
+            MapManager.Instance.TeleportPlayer(this.GetComponent<Teleporter>());
             if(!isLobbyPortal)
             {
-                _mapManager.DestroyMap();
+                MapManager.Instance.RestartGame();
             }
         }
     }
@@ -53,6 +54,7 @@ public class Teleporter : NetworkBehaviour
     {
         // Логика для активации портала
         Debug.Log("All enemies defeated. Portal is now active!");
+        gameObject.SetActive(true);
         // Ваш код для активации портала
     }
 }

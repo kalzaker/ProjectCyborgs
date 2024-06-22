@@ -3,7 +3,12 @@ guid: 3cc37e176cad28d4bbd1df26788ea487
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - spawnPoint: {instanceID: 0}
+  - teleporter: {fileID: 1669735288472867675, guid: b14d268b0355cad4cba2593df940b231, type: 3}
+  - enemySpawner: {fileID: 7719915231797957182, guid: 5e0ad4498dce9f14c907a3ebd56b4dde, type: 3}
+  - enemyManager: {fileID: -2465912535130891714, guid: a9dfbe569fb13e84d89525d7d23c529f, type: 3}
+  - teleporterSpawnPos: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

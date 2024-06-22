@@ -19,8 +19,6 @@ public class Movement : NetworkBehaviour
     [SyncVar]
     Vector2 _mousePosition;
 
-    bool skipWeaponActions;
-
     Vector2 lookDirection;
 
     [SyncVar]
@@ -41,21 +39,29 @@ public class Movement : NetworkBehaviour
 
     void Update()
     {
+
         if (!isLocalPlayer) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ChangeMenuVisibility();
+            Debug.Log("Bebra");
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RestartGame();
+        }
+
         if (!GetComponent<Player>().canMove) return;
 
         _mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetButtonDown("Fire2"))
         {
-            UseObject(_mousePosition);
-            if (!skipWeaponActions)
-            {
-                DropGun(1.2f);
-                TryPickUpGun(_mousePosition);
-            }
+            DropGun(1.2f);
+            TryPickUpGun(_mousePosition);
         }
-        skipWeaponActions = false;
 
         if (Input.GetButton("Fire1"))
         {
@@ -100,9 +106,23 @@ public class Movement : NetworkBehaviour
                     gun = null;
                     return;
                 }
-                gun.CmdPickUp(transform, firePoint.localPosition);
-                //gun.RpcPickUp(transform, firePoint.localPosition);
-                gun.PickUp(transform, firePoint.localPosition);
+
+                EventManager.weaponPickedUp.Invoke(gun);
+
+                if (!isServer)
+                {
+                    gun.CmdPickUp(transform, firePoint.localPosition);
+                    gun.PickUp(transform, firePoint.localPosition);
+                    gun.CmdPlayPickUpSound();
+                    return;
+                }
+                else
+                {
+                    gun.RpcPickUp(transform, firePoint.localPosition);
+                    gun.PickUp(transform, firePoint.localPosition);
+                    gun.RpcPlayPickUpSound();
+                    return;
+                }
             }
         }
     }
@@ -111,29 +131,41 @@ public class Movement : NetworkBehaviour
     {
         Debug.Log("CmdDropGun");
         if (_gun == null) return;
-        _gun.CmdDrop(gunFlyTime);
-        //_gun.RpcDrop(gunFlyTime);
-        _gun.Drop(gunFlyTime);
+
+        EventManager.weaponDropped.Invoke();
+
+        if (!isServer)
+        {
+            _gun.CmdDrop(gunFlyTime);
+            _gun.Drop(gunFlyTime);
+        }
+        if (isServer)
+        {
+            _gun.RpcDrop(gunFlyTime);
+            _gun.Drop(gunFlyTime);
+        }
         _gun = null;
     }
 
     void Attack(Vector2 mousePos)
     {
         if (_gun == null) return;
-        _gun.CmdAttack(mousePos - _rigidbody.position);
+        _gun.Attack(mousePos - _rigidbody.position);
     }
 
-    void UseObject(Vector2 mousePos)
+
+    void ChangeMenuVisibility()
     {
-        Debug.Log("UseObject");
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, Mathf.Infinity, usableObjectMask);
-        if (hit.collider != null && Vector2.Distance(transform.position, hit.collider.gameObject.transform.position) <= 2f)
+        UI_Controller.instance.ChangeMenuVisibility();
+        if (!GetComponent<Player>().alive)
         {
-            if (hit.collider.TryGetComponent<IUsableObject>(out IUsableObject usableObject))
-            {
-                usableObject.Use();
-                skipWeaponActions = true;
-            }
+            return;
         }
+        GetComponent<Player>().canMove = !UI_Controller.instance.menuIsVisible;
+    }
+
+    void RestartGame()
+    {
+        UI_Controller.instance.RestartGame();
     }
 }

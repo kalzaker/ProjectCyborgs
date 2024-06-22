@@ -181,16 +181,6 @@ MonoBehaviour:
   - {fileID: 7981553058328476357, guid: 31484f93862c75546ac0289981028bd6, type: 3}
   _enemiesCount: 0
   _playerPosPoint: {fileID: 0}
-  waypoints:
-  - {fileID: 6935129605459077982}
-  - {fileID: 1727330710964358043}
-  - {fileID: 1325253794939360522}
-  - {fileID: 7868970138339056399}
-  _points:
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
-  - {x: 0, y: 0}
 --- !u!114 &-4957620388244532035
 MonoBehaviour:
   m_ObjectHideFlags: 0

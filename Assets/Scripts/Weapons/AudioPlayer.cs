@@ -6,7 +6,6 @@ public class AudioPlayer : MonoBehaviour
 {
     private List<AudioSource> audioSources;
 
-    public static float soundVolume = 0.3f;
 
     void Awake()
     {
@@ -23,6 +22,7 @@ public class AudioPlayer : MonoBehaviour
         if (availableSource != null)
         {
             availableSource.clip = clip;
+            availableSource.volume = SoundManager.instance.sfxVolume;
             availableSource.Play();
         }
     }

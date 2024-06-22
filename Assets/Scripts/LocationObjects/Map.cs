@@ -10,15 +10,13 @@ public class Map : NetworkBehaviour
     [SerializeField] EnemySpawner enemySpawner;
     [SerializeField] EnemyManager enemyManager;
 
+    [SerializeField]
+    EnemySpawnerParameters[] spawnerParametersArray;
+
     [SerializeField] Transform teleporterSpawnPos;
-    [SerializeField] Transform[] enemySpawnerPositions;
 
-    [SerializeField] Path[] paths;
+    [SerializeField] List<Path> paths;
 
-    [SyncVar]
-    [SerializeField] int[] enemiesCount;
-
-    [SerializeField] List<GameObject> objectsToDestroy = new List<GameObject>();
 
     void Start()
     {
@@ -28,6 +26,9 @@ public class Map : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        spawnerParametersArray = FindObjectsOfType<EnemySpawnerParameters>();
+
         if (isServer)
         {
             CmdSpawnObjects();
@@ -56,26 +57,32 @@ public class Map : NetworkBehaviour
 
     void CreateSpawners()
     {
-        for (int i = 0; i < enemySpawnerPositions.Length; i++)
+        for (int i = 0; i < spawnerParametersArray.Length; i++)
         {
-            CreateSpawner(GetWaypointsPositions(paths[i]), i, enemiesCount[i]);
+            CreateSpawner(spawnerParametersArray[i]);
         }
     }
 
-    void CreateSpawner(Vector2[] positions, int count, int enemiesCount)
+    void CreateSpawner(EnemySpawnerParameters parameters)
     {
+        parameters = parameters.GetComponent<EnemySpawnerParameters>();
         if (!isServer) return;
-        GameObject spawnerClone = Instantiate(enemySpawner.gameObject, enemySpawnerPositions[count].position, Quaternion.identity);
+        GameObject spawnerClone = Instantiate(enemySpawner.gameObject, GetSpawnerPositionFromSpawnerParameters(parameters).position, Quaternion.identity);
 
-        spawnerClone.GetComponent<EnemySpawner>()._enemiesCount = enemiesCount;
-        for (int i = 0; i < positions.Length; i++)
+        spawnerClone.GetComponent<EnemySpawner>()._enemiesCount = GetEnemiesCountFromSpawnerParameters(parameters);
+
+        Vector2[] points = GetWaypointsPositions(GetPathFromSpawnerParameters(parameters));
+        for (int i = 0; i < points.Length; i++)
         {
-            spawnerClone.GetComponent<EnemySpawner>()._points.Add(positions[i]);
+            spawnerClone.GetComponent<EnemySpawner>()._points.Add(points[i]);
         }
+
+        Debug.Log(spawnerClone);
+        MapManager.Instance.objectsToDestroy.Add(spawnerClone as GameObject);
+        Debug.Log(MapManager.Instance.objectsToDestroy);
 
         NetworkServer.Spawn(spawnerClone);
 
-        objectsToDestroy.Add(spawnerClone);
     }
 
     void CreateEnemyManager()
@@ -83,7 +90,7 @@ public class Map : NetworkBehaviour
         if (!isServer) return;
         GameObject enManager = Instantiate(enemyManager.gameObject, transform.position, Quaternion.identity);
         NetworkServer.Spawn(enManager);
-        objectsToDestroy.Add(enManager);
+        MapManager.Instance.objectsToDestroy.Add(enManager);
     }
 
     void CreateTeleporter()
@@ -91,19 +98,35 @@ public class Map : NetworkBehaviour
         if (!isServer) return;
         GameObject portal = Instantiate(teleporter.gameObject, teleporterSpawnPos.position, Quaternion.identity);
         NetworkServer.Spawn(portal);
-        objectsToDestroy.Add(portal);
+        MapManager.Instance.objectsToDestroy.Add(portal);
     }
 
-    public void DestroyAllObjectsOnMap()
+    
+
+    Path GetPathFromSpawnerParameters(EnemySpawnerParameters spawnerParams)
     {
-        foreach (GameObject obj in objectsToDestroy)
+        Path tempPath = new Path();
+        for(int i = 0; i < spawnerParams.GetComponent<EnemySpawnerParameters>().pathParentObject.childCount; i++)
         {
-            Destroy(obj);
+            tempPath.waypoints.Add(spawnerParams.GetComponent<EnemySpawnerParameters>().pathParentObject.GetChild(i));
         }
-        foreach (Weapon weapon in EnemyManager.Instance.enemiesWeapons)
-        {
-            NetworkServer.Destroy(weapon.gameObject);
-        }
+        
+
+        return tempPath;
+    }
+
+    Transform GetSpawnerPositionFromSpawnerParameters(EnemySpawnerParameters spawnerParams)
+    {
+        Transform transform = spawnerParams.GetComponent<EnemySpawnerParameters>().transform; 
+        
+        return transform;
+    }
+
+    int GetEnemiesCountFromSpawnerParameters(EnemySpawnerParameters spawnerParams)
+    {
+        int count = spawnerParams.GetComponent<EnemySpawnerParameters>().enemiesCount;
+
+        return count;
     }
 
     Vector2[] GetWaypointsPositions(Path path)

@@ -9,8 +9,13 @@ public class MeleeWeapon : Weapon
 
     [SerializeField] AudioClip hitSound;
 
+    public override void Attack(Vector2 shootDirection)
+    {
+        CmdAttack(shootDirection);
+    }
+
     [Command(requiresAuthority = false)]
-    public override void CmdAttack(Vector2 shootDirection)
+    void CmdAttack(Vector2 shootDirection)
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(new Vector2(attackPoint.position.x, attackPoint.position.y), attackRange, enemyLayer);
         if (hitColliders.Length == 0) return;

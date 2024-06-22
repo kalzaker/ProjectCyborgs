@@ -6,38 +6,33 @@ using Mirror;
 
 public class SoundManager : NetworkBehaviour
 {
-    [SerializeField] AudioSource audioSource;
+    public static SoundManager instance;
 
-    [SerializeField] AudioClip[] backGroundMusic;
+    [SerializeField] public AudioSource audioSource;
 
     [SerializeField] bool isMainMenu;
 
+    public float musicVolume = 0.3f;
+    public float sfxVolume = 0.3f;
+
     void Start()
     {
-        PlayNextTrack();
-    }
-
-    void Update()
-    {
-        if (!audioSource.isPlaying)
+        if(instance == null)
         {
-            PlayNextTrack();
-        }
-    }
-
-    void PlayNextTrack()
-    {
-        if (isMainMenu)
-        {
-            audioSource.clip = backGroundMusic[0];
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
-            audioSource.clip = backGroundMusic[Random.Range(1, backGroundMusic.Length - 1)];
-            Debug.Log(backGroundMusic.Length);
+            Destroy(gameObject);
         }
-        audioSource.Play();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = musicVolume;
     }
 
-
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        GetComponent<MusicPlayer>().PlayNextTrack();
+    }
 }

@@ -59,6 +59,7 @@ public class EnemySpawner : NetworkBehaviour
         {
             GameObject enemy = Instantiate(enemies[Random.Range(0, enemies.Length)].gameObject, transform.position, Quaternion.identity);
             Enemy enemyComponent = enemy.GetComponent<Enemy>();
+            MapManager.Instance.objectsToDestroy.Add(enemy);
             if (enemyComponent != null)
             {
                 enemyComponent.debugPlayerPosPoint = _playerPosPoint;
@@ -69,6 +70,7 @@ public class EnemySpawner : NetworkBehaviour
                     GameObject tempPoint = new GameObject("Waypoint");
                     tempPoint.transform.position = point;
                     enemyComponent.path.waypoints.Add(tempPoint.transform);
+                    MapManager.Instance.objectsToDestroy.Add(tempPoint);
                 }
 
                 // Only the server should call NetworkServer.Spawn

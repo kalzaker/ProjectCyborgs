@@ -6,6 +6,8 @@ using Mirror;
 
 public abstract class Weapon : NetworkBehaviour
 {
+    public string weaponName;
+
     [SerializeField] protected LayerMask enemyLayer;
 
     Rigidbody2D rb;
@@ -13,12 +15,15 @@ public abstract class Weapon : NetworkBehaviour
     [SyncVar]
     float flyingTime;
 
+    [SyncVar]
     protected float timeBetweenAttacks;
 
+    [SyncVar]
     public bool pickUpAvailable;
 
     [SyncVar]
     bool canAttack;
+    [SyncVar]
     public bool isInEnemiesHands;
 
     [SyncVar]
@@ -101,6 +106,22 @@ public abstract class Weapon : NetworkBehaviour
         }
     }
 
+    void PlayPickUpSound()
+    {
+        audioPlayer.PlaySound(pickUpSound);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdPlayPickUpSound()
+    {
+        PlayPickUpSound();
+    }
+
+    [ClientRpc]
+    public void RpcPlayPickUpSound()
+    {
+        PlayPickUpSound();
+    }
 
     //----------DROP----------
     [Command(requiresAuthority = false)]
@@ -155,14 +176,8 @@ public abstract class Weapon : NetworkBehaviour
     }
 
     //-------------ATTACK---------------
-    public void Attack(Vector2 shootDirection)
+    public virtual void Attack(Vector2 shootDirection)
     {
-        CmdAttack(shootDirection);
-    }
-
-    [Command(requiresAuthority = false)]
-    public virtual void CmdAttack(Vector2 shootDirection)
-    {
-        if (!canAttack) return;
+        if(!canAttack) return;
     }
 }
